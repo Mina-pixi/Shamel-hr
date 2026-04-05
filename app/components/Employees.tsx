@@ -18,6 +18,8 @@ export default function Employees({ dark, t }: { dark?: boolean, t?: any }) {
     bank_account: '',
   });
   const [msg, setMsg] = useState('');
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
 
   useEffect(() => { load(); }, []);
 
@@ -68,6 +70,22 @@ export default function Employees({ dark, t }: { dark?: boolean, t?: any }) {
   const toggleActive = async (id: string, current: boolean) => {
     await pointsDB.from('hr_employees').update({ is_active: !current }).eq('id', id);
     load();
+  };
+
+  const saveEdit = async () => {
+    const { error } = await pointsDB.from('hr_employees').update({
+      name: editForm.name,
+      base_salary: Number(editForm.base_salary),
+      kpi_amount: Number(editForm.kpi_amount),
+      bonus_per_sub: Number(editForm.bonus_per_sub),
+      team_name: editForm.team_name,
+      phone: editForm.phone,
+      national_id: editForm.national_id,
+      bank_account: editForm.bank_account,
+      hire_date: editForm.hire_date,
+    }).eq('id', editId);
+    if (!error) { setEditId(null); load(); }
+    else alert('Error: ' + error.message);
   };
 
   const filtered = employees.filter(e =>
