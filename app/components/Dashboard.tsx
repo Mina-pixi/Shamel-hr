@@ -57,17 +57,49 @@ export default function Dashboard({ onNavigate, dark, t }: { onNavigate: (page: 
   };
 
   const statCards = [
-    { label: 'Total Employees', value: stats.employees, color: '#58a6ff', icon: '👥' },
-    { label: `Payroll ${monthName}`, value: `EGP ${stats.totalPayroll.toLocaleString()}`, color: '#3fb950', icon: '💰' },
-    { label: 'Active This Month', value: stats.active, color: '#a371f7', icon: '⚡' },
-    { label: 'Pending Pay Slips', value: stats.pendingSlips, color: '#f0883e', icon: '📄' },
+    { label: 'Total Employees', value: stats.employees, color: '#58a6ff', icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <defs><linearGradient id="si1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#58a6ff"/><stop offset="100%" stopColor="#1f6feb"/></linearGradient></defs>
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="url(#si1)" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="9" cy="7" r="4" stroke="url(#si1)" strokeWidth="2"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="url(#si1)" strokeWidth="2" strokeLinecap="round"/>
+      </svg>) },
+    { label: \`Payroll \${monthName}\`, value: \`EGP \${stats.totalPayroll.toLocaleString()}\`, color: '#3fb950', icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <defs><linearGradient id="si2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#3fb950"/><stop offset="100%" stopColor="#2ea043"/></linearGradient></defs>
+        <rect x="2" y="5" width="20" height="14" rx="2" stroke="url(#si2)" strokeWidth="2"/>
+        <path d="M2 10h20" stroke="url(#si2)" strokeWidth="2"/>
+        <circle cx="12" cy="15" r="2" stroke="url(#si2)" strokeWidth="2"/>
+      </svg>) },
+    { label: 'Active This Month', value: stats.active, color: '#a371f7', icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <defs><linearGradient id="si3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#a371f7"/><stop offset="100%" stopColor="#6e40c9"/></linearGradient></defs>
+        <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" stroke="url(#si3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="url(#si3)" fillOpacity="0.2"/>
+      </svg>) },
+    { label: 'Pending Pay Slips', value: stats.pendingSlips, color: '#f0883e', icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <defs><linearGradient id="si4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#f0883e"/><stop offset="100%" stopColor="#d35400"/></linearGradient></defs>
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="url(#si4)" strokeWidth="2" strokeLinecap="round"/>
+        <polyline points="14,2 14,8 20,8" stroke="url(#si4)" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="8" y1="13" x2="16" y2="13" stroke="url(#si4)" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="8" y1="17" x2="12" y2="17" stroke="url(#si4)" strokeWidth="2" strokeLinecap="round"/>
+      </svg>) },
   ];
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <defs><linearGradient id="dg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#58a6ff"/><stop offset="100%" stopColor="#a371f7"/></linearGradient></defs>
+            <rect x="3" y="3" width="7" height="7" rx="1" stroke="url(#dg)" strokeWidth="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="1" stroke="url(#dg)" strokeWidth="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="1" stroke="url(#dg)" strokeWidth="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="1" stroke="url(#dg)" strokeWidth="2"/>
+          </svg>
           <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>HR Dashboard</h1>
+        </div>
           <div style={{ color: '#8b949e', fontSize: '0.85rem', marginTop: '2px' }}>{monthName} {year} — Shamel Telesales</div>
         </div>
         <button onClick={() => onNavigate('employees')} style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #3fb950, #2ea043)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '0.875rem' }}>
@@ -79,7 +111,7 @@ export default function Dashboard({ onNavigate, dark, t }: { onNavigate: (page: 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {statCards.map((s, i) => (
           <div key={i} className="glass-panel" style={{ padding: '20px', borderTop: `3px solid ${s.color}` }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{s.icon}</div>
+            <div style={{ marginBottom: '8px' }}>{s.icon}</div>
             <div style={{ color: '#8b949e', fontSize: '0.78rem', marginBottom: '6px' }}>{s.label}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '800', color: s.color }}>{loading ? '...' : s.value}</div>
           </div>

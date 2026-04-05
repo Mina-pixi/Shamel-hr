@@ -71,7 +71,15 @@ export default function Payroll({ dark, t }: { dark?: boolean, t?: any }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>💰 Monthly Payroll</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <defs><linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#FFD700"/><stop offset="100%" stopColor="#FFA500"/></linearGradient></defs>
+            <rect x="2" y="5" width="20" height="14" rx="2" stroke="url(#pg)" strokeWidth="2"/>
+            <path d="M2 10h20" stroke="url(#pg)" strokeWidth="2"/>
+            <circle cx="12" cy="15" r="2" stroke="url(#pg)" strokeWidth="2"/>
+          </svg>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>Monthly Payroll</h1>
+        </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <select value={month} onChange={e => setMonth(Number(e.target.value))} style={{ width: '140px' }}>
             {MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}

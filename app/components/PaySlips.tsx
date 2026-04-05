@@ -131,7 +131,16 @@ export default function PaySlips({ dark, t }: { dark?: boolean, t?: any }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>📄 Pay Slips</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <defs><linearGradient id="slg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#58a6ff"/><stop offset="100%" stopColor="#1f6feb"/></linearGradient></defs>
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="url(#slg)" strokeWidth="2" strokeLinecap="round"/>
+            <polyline points="14,2 14,8 20,8" stroke="url(#slg)" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="8" y1="13" x2="16" y2="13" stroke="url(#slg)" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="8" y1="17" x2="12" y2="17" stroke="url(#slg)" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>Pay Slips</h1>
+        </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <select value={month} onChange={e => setMonth(Number(e.target.value))} style={{ width: '140px' }}>
             {MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}

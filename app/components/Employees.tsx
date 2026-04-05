@@ -79,7 +79,15 @@ export default function Employees({ dark, t }: { dark?: boolean, t?: any }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>👥 Employees</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <defs><linearGradient id="eg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#3fb950"/><stop offset="100%" stopColor="#2ea043"/></linearGradient></defs>
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="url(#eg)" strokeWidth="2" strokeLinecap="round"/>
+            <circle cx="9" cy="7" r="4" stroke="url(#eg)" strokeWidth="2"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="url(#eg)" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>Employees</h1>
+        </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <input placeholder="Search employees..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: '220px' }} />
           <button onClick={() => setShowForm(!showForm)} style={{ padding: '8px 20px', background: 'linear-gradient(135deg, #3fb950, #2ea043)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}>
