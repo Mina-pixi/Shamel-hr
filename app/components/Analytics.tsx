@@ -20,6 +20,10 @@ export default function Analytics({ dark, t }: { dark?: boolean, t?: any }) {
   const [teamData, setTeamData] = useState<any[]>([]);
   const [topAgents, setTopAgents] = useState<any[]>([]);
   const [kpiData, setKpiData] = useState({ achieved: 0, partial: 0, missed: 0, total: 0 });
+  const [financialData, setFinancialData] = useState<any[]>([]);
+  const [topEarners, setTopEarners] = useState<any[]>([]);
+  const [teamPayroll, setTeamPayroll] = useState<any[]>([]);
+  const [currentFinancials, setCurrentFinancials] = useState({ totalBase: 0, totalKpi: 0, totalNet: 0 });
   const [loading, setLoading] = useState(true);
   const currentMonth = now.getMonth() + 1;
 
@@ -59,6 +63,53 @@ export default function Analytics({ dark, t }: { dark?: boolean, t?: any }) {
       else missed++;
     }
     setKpiData({ achieved, partial, missed, total: achieved + partial + missed });
+
+    // Financial calculations per month
+    const finMonthly = results.map((r, i) => {
+      const data = r.data || [];
+      let totalBase = 0, totalKpi = 0;
+      for (const e of emp) {
+        totalBase += Number(e.base_salary);
+        const perf = data.find((p: any) => p.email === e.email);
+        const subs = perf ? Number(perf.subscription_count) : 0;
+        const achievement = subs / 60;
+        const kpiEarned = achievement >= 0.8 ? Math.min(achievement, 1) * Number(e.kpi_amount) : 0;
+        totalKpi += kpiEarned;
+      }
+      return { month: MONTHS[i], totalBase, totalKpi, totalNet: totalBase + totalKpi };
+    });
+    setFinancialData(finMonthly);
+
+    // Current month financials
+    const curFin = finMonthly[currentMonth - 1] || { totalBase: 0, totalKpi: 0, totalNet: 0 };
+    setCurrentFinancials(curFin);
+
+    // Top earners current month
+    const earners = emp.map((e: any) => {
+      const perf = currentData.find((p: any) => p.email === e.email);
+      const subs = perf ? Number(perf.subscription_count) : 0;
+      const achievement = subs / 60;
+      const kpiEarned = achievement >= 0.8 ? Math.min(achievement, 1) * Number(e.kpi_amount) : 0;
+      return { name: e.name, team: e.team_name, base: Number(e.base_salary), kpi: kpiEarned, net: Number(e.base_salary) + kpiEarned, subs };
+    }).sort((a: any, b: any) => b.net - a.net).slice(0, 8);
+    setTopEarners(earners);
+
+    // Team payroll
+    const teamPay: Record<string, any> = {};
+    for (const e of emp) {
+      const team = e.team_name || 'Unassigned';
+      if (!teamPay[team]) teamPay[team] = { team, base: 0, kpi: 0, net: 0, agents: 0 };
+      const perf = currentData.find((p: any) => p.email === e.email);
+      const subs = perf ? Number(perf.subscription_count) : 0;
+      const achievement = subs / 60;
+      const kpiEarned = achievement >= 0.8 ? Math.min(achievement, 1) * Number(e.kpi_amount) : 0;
+      teamPay[team].base += Number(e.base_salary);
+      teamPay[team].kpi += kpiEarned;
+      teamPay[team].net += Number(e.base_salary) + kpiEarned;
+      teamPay[team].agents++;
+    }
+    setTeamPayroll(Object.values(teamPay).sort((a: any, b: any) => b.net - a.net).filter((t: any) => t.net > 0));
+
     setLoading(false);
   };
 
@@ -174,12 +225,112 @@ export default function Analytics({ dark, t }: { dark?: boolean, t?: any }) {
         </div>
       </div>
 
+      {/* Financial Summary Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '20px' }}>
+        {[
+          { label: 'Total Base Salaries', value: `EGP ${currentFinancials.totalBase.toLocaleString()}`, color: '#58a6ff', sub: 'Fixed monthly cost' },
+          { label: 'Total KPI Bonuses', value: `EGP ${Math.round(currentFinancials.totalKpi).toLocaleString()}`, color: '#FFD700', sub: 'Performance based' },
+          { label: 'Total Net Payroll', value: `EGP ${Math.round(currentFinancials.totalNet).toLocaleString()}`, color: '#3fb950', sub: FULL_MONTHS[currentMonth - 1] + ' ' + year },
+        ].map((s, i) => (
+          <div key={i} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '20px', borderTop: `3px solid ${s.color}` }}>
+            <div style={{ color: subtext, fontSize: '0.78rem', marginBottom: '8px' }}>{s.label}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '800', color: s.color }}>{loading ? '...' : s.value}</div>
+            <div style={{ color: subtext, fontSize: '0.75rem', marginTop: '4px' }}>{s.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Payroll Trend Chart */}
+      <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+        <div style={{ fontWeight: '600', color: text, marginBottom: '20px' }}>💰 Payroll Trend — {year}</div>
+        {loading ? <div style={{ textAlign: 'center', padding: '40px', color: subtext }}>Loading...</div> : (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '180px', padding: '0 8px', marginBottom: '8px' }}>
+              {financialData.map((m, i) => {
+                const maxNet = Math.max(...financialData.map(f => f.totalNet), 1);
+                const baseH = Math.max((m.totalBase / maxNet) * 150, 4);
+                const kpiH = Math.max((m.totalKpi / maxNet) * 150, m.totalKpi > 0 ? 4 : 0);
+                return (
+                  <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', height: '100%', justifyContent: 'flex-end' }}>
+                    <div style={{ fontSize: '0.6rem', color: subtext }}>{m.totalNet > 0 ? `${Math.round(m.totalNet/1000)}k` : ''}</div>
+                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', borderRadius: '4px 4px 0 0', overflow: 'hidden' }}>
+                      <div style={{ width: '100%', height: `${kpiH}px`, background: 'linear-gradient(180deg, #FFD700, #FFA500)', opacity: i === currentMonth - 1 ? 1 : 0.5 }} />
+                      <div style={{ width: '100%', height: `${baseH}px`, background: i === currentMonth - 1 ? 'linear-gradient(180deg, #58a6ff, #1f6feb)' : dark ? 'rgba(88,166,255,0.25)' : 'rgba(88,166,255,0.15)' }} />
+                    </div>
+                    <div style={{ color: subtext, fontSize: '0.65rem' }}>{m.month}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: '#58a6ff' }} />
+                <span style={{ fontSize: '0.75rem', color: subtext }}>Base Salary</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: '#FFD700' }} />
+                <span style={{ fontSize: '0.75rem', color: subtext }}>KPI Bonus</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+        {/* Top Earners */}
+        <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '20px' }}>
+          <div style={{ fontWeight: '600', color: text, marginBottom: '16px' }}>💵 Top Earners — {FULL_MONTHS[currentMonth - 1]}</div>
+          {loading ? <div style={{ textAlign: 'center', padding: '20px', color: subtext }}>Loading...</div> : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {topEarners.map((e, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg,#58a6ff,#a371f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: '700', color: 'white', flexShrink: 0 }}>{i + 1}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '0.83rem', fontWeight: '600', color: text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</span>
+                      <span style={{ fontSize: '0.83rem', color: '#3fb950', fontWeight: '700', flexShrink: 0, marginLeft: '8px' }}>EGP {Math.round(e.net).toLocaleString()}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#58a6ff' }}>Base: EGP {Number(e.base).toLocaleString()}</span>
+                      {e.kpi > 0 && <span style={{ fontSize: '0.7rem', color: '#FFD700' }}>+KPI: EGP {Math.round(e.kpi).toLocaleString()}</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Team Payroll */}
+        <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '20px' }}>
+          <div style={{ fontWeight: '600', color: text, marginBottom: '16px' }}>👥 Team Payroll — {FULL_MONTHS[currentMonth - 1]}</div>
+          {loading ? <div style={{ textAlign: 'center', padding: '20px', color: subtext }}>Loading...</div> : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {teamPayroll.slice(0,7).map((team, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: '8px' }}>
+                  <div>
+                    <div style={{ fontSize: '0.83rem', fontWeight: '600', color: text }}>{TEAM_NAMES[team.team] || team.team}</div>
+                    <div style={{ fontSize: '0.7rem', color: subtext, marginTop: '2px' }}>
+                      Base: EGP {Math.round(team.base).toLocaleString()} · KPI: EGP {Math.round(team.kpi).toLocaleString()}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#3fb950' }}>EGP {Math.round(team.net).toLocaleString()}</div>
+                    <div style={{ fontSize: '0.7rem', color: subtext }}>{team.agents} agents</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Monthly Table */}
       <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', overflow: 'hidden' }}>
         <div style={{ padding: '16px 20px', borderBottom: `1px solid ${border}`, fontWeight: '600', color: text }}>📋 Monthly Summary — {year}</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr>{['Month','Subscriptions','Calls','Active Agents','Avg Subs/Agent'].map(h => (
+            <tr>{['Month','Subscriptions','Calls','Active Agents','Avg Subs/Agent','Total Payroll','KPI Paid'].map(h => (
               <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: '0.72rem', color: subtext, fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase', borderBottom: `1px solid ${border}` }}>{h}</th>
             ))}</tr>
           </thead>
@@ -192,6 +343,8 @@ export default function Analytics({ dark, t }: { dark?: boolean, t?: any }) {
                 <td style={{ padding: '12px 16px', color: '#58a6ff' }}>{m.calls.toLocaleString()}</td>
                 <td style={{ padding: '12px 16px', color: '#a371f7' }}>{m.agents}</td>
                 <td style={{ padding: '12px 16px', color: subtext }}>{m.agents > 0 ? (m.subs / m.agents).toFixed(1) : '0'}</td>
+                <td style={{ padding: '12px 16px', color: '#3fb950', fontWeight: '600' }}>EGP {financialData[i] ? Math.round(financialData[i].totalNet).toLocaleString() : '0'}</td>
+                <td style={{ padding: '12px 16px', color: '#FFD700' }}>EGP {financialData[i] ? Math.round(financialData[i].totalKpi).toLocaleString() : '0'}</td>
               </tr>
             ))}
           </tbody>
