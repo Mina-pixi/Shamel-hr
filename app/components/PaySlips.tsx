@@ -142,10 +142,10 @@ export default function PaySlips({ dark, t }: { dark?: boolean, t?: any }) {
           <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>Pay Slips</h1>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <select value={month} onChange={e => setMonth(Number(e.target.value))} style={{ width: '140px' }}>
+          <select value={month} onChange={e => setMonth(Number(e.target.value))} style={{ width: '140px', background: '#161b22', border: '1px solid #30363d', color: '#e6edf3', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer' }}>
             {MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}
           </select>
-          <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ width: '100px' }}>
+          <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ width: '100px', background: '#161b22', border: '1px solid #30363d', color: '#e6edf3', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer' }}>
             {[2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
