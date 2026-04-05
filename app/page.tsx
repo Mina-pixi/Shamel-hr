@@ -136,8 +136,9 @@ export default function Home() {
         </div>
         <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, #58a6ff, #a371f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', boxShadow: '0 8px 24px rgba(88,166,255,0.3)' }}>
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="white" strokeWidth="2"/>
-            <polyline points="9,22 9,12 15,12 15,22" stroke="white" strokeWidth="2"/>
+            <circle cx="9" cy="6" r="3" stroke="white" strokeWidth="2"/>
+            <path d="M1 20v-2a6 6 0 016-6h4a6 6 0 016 6v2" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M17 8l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
         <div style={{ fontSize: '1.5rem', fontWeight: '800', background: 'linear-gradient(135deg, #58a6ff, #a371f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginBottom: '4px' }}>SHAMEL HR</div>
@@ -171,8 +172,9 @@ export default function Home() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #58a6ff, #a371f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(88,166,255,0.3)' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="white" strokeWidth="2"/>
-                <polyline points="9,22 9,12 15,12 15,22" stroke="white" strokeWidth="2"/>
+                <circle cx="9" cy="6" r="3" stroke="white" strokeWidth="2"/>
+                <path d="M1 20v-2a6 6 0 016-6h4a6 6 0 016 6v2" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M17 8l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
             <div>
