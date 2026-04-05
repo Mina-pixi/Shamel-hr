@@ -1,101 +1,93 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
+import Dashboard from './components/Dashboard';
+import Employees from './components/Employees';
+import Payroll from './components/Payroll';
+import PaySlips from './components/PaySlips';
+
+const NAV = [
+  { id: 'dashboard', label: 'Dashboard', icon: '📊', section: 'Main' },
+  { id: 'employees', label: 'Employees', icon: '👥', section: 'Main' },
+  { id: 'payroll', label: 'Monthly Payroll', icon: '💰', section: 'Payroll' },
+  { id: 'payslips', label: 'Pay Slips', icon: '📄', section: 'Payroll' },
+];
+
+const HR_PASSWORD = 'shamelhr2026';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [page, setPage] = useState('dashboard');
+  const [auth, setAuth] = useState(false);
+  const [pw, setPw] = useState('');
+  const [err, setErr] = useState('');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  if (!auth) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0e1a' }}>
+      <div className="glass-panel" style={{ padding: '48px', width: '380px', textAlign: 'center' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🏢</div>
+        <div style={{ fontSize: '1.5rem', fontWeight: '800', background: 'linear-gradient(135deg, #58a6ff, #a371f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginBottom: '4px' }}>
+          SHAMEL HR
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div style={{ color: '#8b949e', fontSize: '0.8rem', letterSpacing: '2px', marginBottom: '32px' }}>HUMAN RESOURCES SYSTEM</div>
+        <input type="password" placeholder="Enter HR Password" value={pw}
+          onChange={e => setPw(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') { if (pw === HR_PASSWORD) { setAuth(true); setErr(''); } else setErr('Wrong password'); }}}
+          style={{ marginBottom: '12px', padding: '12px 16px', fontSize: '1rem' }}
+        />
+        {err && <div style={{ color: '#f85149', fontSize: '0.85rem', marginBottom: '12px' }}>{err}</div>}
+        <button onClick={() => { if (pw === HR_PASSWORD) { setAuth(true); setErr(''); } else setErr('Wrong password'); }}
+          style={{ width: '100%', padding: '12px', background: 'linear-gradient(135deg, #58a6ff, #1f6feb)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer' }}>
+          Login
+        </button>
+      </div>
+    </div>
+  );
+
+  const sections = [...new Set(NAV.map(n => n.section))];
+
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
+      {/* Sidebar */}
+      <div style={{ width: '220px', background: '#0d1117', borderRight: '1px solid #21262d', position: 'fixed', top: 0, bottom: 0, display: 'flex', flexDirection: 'column', zIndex: 100 }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid #21262d' }}>
+          <div style={{ fontWeight: '800', fontSize: '1rem', background: 'linear-gradient(135deg, #58a6ff, #a371f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '1px' }}>SHAMEL HR</div>
+          <div style={{ fontSize: '0.65rem', color: '#8b949e', letterSpacing: '2px', marginTop: '2px' }}>COMMAND CENTER</div>
+        </div>
+
+        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+          {sections.map(section => (
+            <div key={section}>
+              <div style={{ padding: '12px 20px 4px', fontSize: '0.62rem', color: '#444', letterSpacing: '2px', textTransform: 'uppercase' }}>{section}</div>
+              {NAV.filter(n => n.section === section).map(n => (
+                <div key={n.id} onClick={() => setPage(n.id)} style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '10px 20px', cursor: 'pointer', fontSize: '0.875rem',
+                  color: page === n.id ? '#58a6ff' : '#8b949e',
+                  borderLeft: `3px solid ${page === n.id ? '#58a6ff' : 'transparent'}`,
+                  background: page === n.id ? 'rgba(88,166,255,0.08)' : 'transparent',
+                  transition: 'all 0.2s',
+                }}>
+                  <span>{n.icon}</span>
+                  <span>{n.label}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div style={{ padding: '16px 20px', borderTop: '1px solid #21262d' }}>
+          <div style={{ fontSize: '0.72rem', color: '#8b949e' }}>Logged in as</div>
+          <div style={{ fontSize: '0.875rem', fontWeight: '600', marginTop: '2px' }}>HR Manager</div>
+          <button onClick={() => setAuth(false)} style={{ marginTop: '8px', fontSize: '0.75rem', color: '#f85149', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Logout</button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ marginLeft: '220px', flex: 1, padding: '24px' }}>
+        {page === 'dashboard' && <Dashboard onNavigate={setPage} />}
+        {page === 'employees' && <Employees />}
+        {page === 'payroll' && <Payroll />}
+        {page === 'payslips' && <PaySlips />}
+      </div>
     </div>
   );
 }
