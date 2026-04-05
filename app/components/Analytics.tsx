@@ -5,6 +5,13 @@ import { pointsDB, crmAnon } from '@/lib/supabase';
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FULL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+// Q1 2026 Telesales-Only: Revenue=TM subs revenue, Spend=Agent salaries
+const Q1_DATA: Record<number,any> = {
+  1: { tmSubs: 700, revenue: 434000, spend: 391000, roi: 1.11, cac: 559, abandoned: 1168, familySubs: 384, individualSubs: 316 },
+  2: { tmSubs: 806, revenue: 492000, spend: 501000, roi: 0.98, cac: 622, abandoned: 1364, familySubs: 423, individualSubs: 383 },
+  3: { tmSubs: 421, revenue: 247000, spend: 430000, roi: 0.57, cac: 1021, abandoned: 1636, familySubs: 196, individualSubs: 225 },
+};
+
 const TEAM_NAMES: Record<string, string> = {
   'Team 1': "Mariam's Squad", 'Team 2': "Youssef's Squad",
   'Team 3': "Ruqaia's Squad", 'Team 4': "Jolie's Squad",
@@ -24,6 +31,7 @@ export default function Analytics({ dark, t }: { dark?: boolean, t?: any }) {
   const [topEarners, setTopEarners] = useState<any[]>([]);
   const [teamPayroll, setTeamPayroll] = useState<any[]>([]);
   const [currentFinancials, setCurrentFinancials] = useState({ totalBase: 0, totalKpi: 0, totalNet: 0 });
+  const [revenueData, setRevenueData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const currentMonth = now.getMonth() + 1;
 
@@ -110,6 +118,20 @@ export default function Analytics({ dark, t }: { dark?: boolean, t?: any }) {
     }
     setTeamPayroll(Object.values(teamPay).sort((a: any, b: any) => b.net - a.net).filter((t: any) => t.net > 0));
 
+    // Revenue data per month using Q1 static + live calculation
+    const revData = Array.from({ length: currentMonth }, (_, i) => {
+      const m = i + 1;
+      const q1 = Q1_DATA[m];
+      const liveMonth = results[i]?.data || [];
+      const liveSubs = liveMonth.reduce((s: number, a: any) => s + Number(a.subscription_count), 0);
+      const totalSalaries = emp.reduce((s: number, e: any) => s + Number(e.base_salary), 0);
+      if (q1) {
+        return { month: MONTHS[i], revenue: q1.revenue, spend: q1.spend, roi: q1.roi, cac: q1.cac, subs: q1.tmSubs, abandoned: q1.abandoned, familySubs: q1.familySubs, individualSubs: q1.individualSubs };
+      }
+      return { month: MONTHS[i], revenue: 0, spend: totalSalaries, roi: 0, cac: liveSubs > 0 ? Math.round(totalSalaries/liveSubs) : 0, subs: liveSubs, abandoned: 0, familySubs: 0, individualSubs: 0 };
+    });
+    setRevenueData(revData);
+
     setLoading(false);
   };
 
@@ -151,6 +173,119 @@ export default function Analytics({ dark, t }: { dark?: boolean, t?: any }) {
           </div>
         ))}
       </div>
+
+      {/* Q1 Summary Cards */}
+      {year === 2026 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px', marginBottom: '24px' }}>
+          {[
+            { label: 'Q1 TM Revenue', value: 'EGP 1.17M', sub: 'Telesales only', color: '#3fb950' },
+            { label: 'Q1 Salary Spend', value: 'EGP 1.32M', sub: 'Agent salaries', color: '#f85149' },
+            { label: 'Best TM ROI', value: '1.11x', sub: 'January', color: '#FFD700' },
+            { label: 'Best CAC', value: 'EGP 559', sub: 'January', color: '#58a6ff' },
+            { label: 'Q1 Abandoned', value: '4,168', sub: 'Rising monthly', color: '#a371f7' },
+          ].map((s, i) => (
+            <div key={i} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '16px', borderTop: `3px solid ${s.color}` }}>
+              <div style={{ color: subtext, fontSize: '0.72rem', marginBottom: '6px' }}>{s.label}</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: s.color }}>{s.value}</div>
+              <div style={{ color: subtext, fontSize: '0.7rem', marginTop: '4px' }}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Revenue vs Salary Spend Chart */}
+      {revenueData.some(m => m.revenue > 0) && (
+        <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+          <div style={{ fontWeight: '600', color: text, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>💹 TM Revenue vs Salary Spend</span>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '12px', height: '12px', borderRadius: '2px', background: '#3fb950' }} /><span style={{ fontSize: '0.75rem', color: subtext }}>TM Revenue</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '12px', height: '12px', borderRadius: '2px', background: '#f85149' }} /><span style={{ fontSize: '0.75rem', color: subtext }}>Salary Spend</span></div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', height: '200px', padding: '0 8px' }}>
+            {revenueData.filter(m => m.revenue > 0 || m.spend > 0).map((m, i) => {
+              const maxVal = Math.max(...revenueData.map(r => Math.max(r.revenue, r.spend)), 1);
+              const revH = Math.max((m.revenue / maxVal) * 160, m.revenue > 0 ? 4 : 0);
+              const spendH = Math.max((m.spend / maxVal) * 160, m.spend > 0 ? 4 : 0);
+              return (
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', height: '100%', justifyContent: 'flex-end' }}>
+                  <div style={{ width: '100%', display: 'flex', gap: '4px', alignItems: 'flex-end', justifyContent: 'center' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
+                      <span style={{ fontSize: '0.6rem', color: '#3fb950', fontWeight: '600' }}>{m.revenue > 0 ? Math.round(m.revenue/1000)+'k' : ''}</span>
+                      <div style={{ width: '100%', height: `${revH}px`, background: 'linear-gradient(180deg, #3fb950, #2ea043)', borderRadius: '4px 4px 0 0' }} />
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
+                      <span style={{ fontSize: '0.6rem', color: '#f85149', fontWeight: '600' }}>{m.spend > 0 ? Math.round(m.spend/1000)+'k' : ''}</span>
+                      <div style={{ width: '100%', height: `${spendH}px`, background: 'linear-gradient(180deg, #f85149, #da3633)', borderRadius: '4px 4px 0 0' }} />
+                    </div>
+                  </div>
+                  <div style={{ color: subtext, fontSize: '0.72rem', fontWeight: '600' }}>{m.month}</div>
+                  {m.roi > 0 && <div style={{ fontSize: '0.65rem', color: m.roi >= 1 ? '#3fb950' : '#f85149', fontWeight: '600' }}>ROI {m.roi}x</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Family vs Individual + CAC Cards */}
+      {revenueData.some(m => m.familySubs > 0) && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+          {/* Family vs Individual Chart */}
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '20px' }}>
+            <div style={{ fontWeight: '600', color: text, marginBottom: '16px', display: 'flex', justifyContent: 'space-between' }}>
+              <span>👨‍👩‍👧 Family vs 👤 Individual</span>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '10px', height: '10px', borderRadius: '2px', background: '#58a6ff' }} /><span style={{ fontSize: '0.7rem', color: subtext }}>Family</span></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '10px', height: '10px', borderRadius: '2px', background: '#a371f7' }} /><span style={{ fontSize: '0.7rem', color: subtext }}>Individual</span></div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', height: '150px' }}>
+              {revenueData.filter(m => m.familySubs > 0).map((m, i) => {
+                const maxS = Math.max(...revenueData.map(r => r.familySubs + r.individualSubs), 1);
+                const fH = Math.max((m.familySubs / maxS) * 120, 4);
+                const iH = Math.max((m.individualSubs / maxS) * 120, 4);
+                return (
+                  <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', height: '100%', justifyContent: 'flex-end' }}>
+                    <div style={{ width: '100%', display: 'flex', gap: '3px', alignItems: 'flex-end' }}>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                        <span style={{ fontSize: '0.58rem', color: '#58a6ff' }}>{m.familySubs}</span>
+                        <div style={{ width: '100%', height: `${fH}px`, background: 'linear-gradient(180deg,#58a6ff,#1f6feb)', borderRadius: '4px 4px 0 0' }} />
+                      </div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                        <span style={{ fontSize: '0.58rem', color: '#a371f7' }}>{m.individualSubs}</span>
+                        <div style={{ width: '100%', height: `${iH}px`, background: 'linear-gradient(180deg,#a371f7,#6e40c9)', borderRadius: '4px 4px 0 0' }} />
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '0.65rem', color: subtext }}>{m.month}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* CAC per month */}
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '20px' }}>
+            <div style={{ fontWeight: '600', color: text, marginBottom: '16px' }}>📊 CAC & Abandoned per Month</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {revenueData.filter(m => m.cac > 0).map((m, i) => (
+                <div key={i} style={{ background: dark ? '#0d1117' : '#f7fafc', borderRadius: '8px', padding: '12px 16px', border: `1px solid ${border}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontWeight: '700', color: text, fontSize: '0.9rem' }}>{['January','February','March'][i]}</span>
+                    <span style={{ fontSize: '0.8rem', color: m.roi >= 1 ? '#3fb950' : '#f85149', fontWeight: '700' }}>ROI {m.roi}x</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                    <div><div style={{ fontSize: '0.65rem', color: subtext }}>TM Subs</div><div style={{ fontWeight: '700', color: '#3fb950', fontSize: '0.9rem' }}>{m.subs}</div></div>
+                    <div><div style={{ fontSize: '0.65rem', color: subtext }}>CAC/Sub</div><div style={{ fontWeight: '700', color: m.cac < 700 ? '#3fb950' : '#f85149', fontSize: '0.9rem' }}>EGP {m.cac}</div></div>
+                    <div><div style={{ fontSize: '0.65rem', color: subtext }}>Abandoned</div><div style={{ fontWeight: '700', color: '#a371f7', fontSize: '0.9rem' }}>{m.abandoned.toLocaleString()}</div></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Monthly Bar Chart */}
       <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
