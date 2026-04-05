@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import Employees from './components/Employees';
 import Payroll from './components/Payroll';
 import PaySlips from './components/PaySlips';
+import Analytics from './components/Analytics';
 
 const HR_PASSWORD = 'shamelhr2026';
 
@@ -161,7 +162,7 @@ export default function Home() {
   const activeColor = '#58a6ff';
   const inactiveColor = t.subtext;
 
-  const comingSoon = ['analytics', 'attendance', 'settings', 'hrusers'];
+  const comingSoon = ['attendance', 'settings', 'hrusers'];
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: t.bg, transition: 'all 0.3s', color: t.text }}>
@@ -260,6 +261,7 @@ export default function Home() {
             {page === 'employees' && <Employees dark={dark} t={t} />}
             {page === 'payroll' && <Payroll dark={dark} t={t} />}
             {page === 'payslips' && <PaySlips dark={dark} t={t} />}
+            {page === 'analytics' && <Analytics dark={dark} t={t} />}
           </>
         )}
       </div>
