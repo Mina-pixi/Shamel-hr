@@ -27,13 +27,18 @@ export default function Payroll({ dark, t }: { dark?: boolean, t?: any }) {
       const p = perfData.find((p: any) => p.email === e.email);
       const subs = p ? Number(p.subscription_count) : 0;
       const calls = p ? Number(p.answered_calls) : 0;
-      const bonus = subs * Number(e.bonus_per_sub);
-      const net = Number(e.base_salary) + bonus;
+      const target = Number(e.monthly_target) || 60;
+      const kpiAmount = Number(e.kpi_amount) || 0;
+      const achievement = subs / target;
+      // Min 80% to qualify, then progressive
+      const kpiEarned = achievement >= 0.8 ? Math.min(achievement, 1) * kpiAmount : 0;
+      const net = Number(e.base_salary) + kpiEarned;
       return {
         ...e,
         subscription_count: subs,
         answered_calls: calls,
-        bonus,
+        bonus: kpiEarned,
+        achievement: Math.round(achievement * 100),
         net_salary: net,
         monthly_points: p ? Number(p.monthly_points) : 0,
       };
@@ -117,7 +122,7 @@ export default function Payroll({ dark, t }: { dark?: boolean, t?: any }) {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              {['Employee', 'Team', 'Base Salary', 'Subs', 'Bonus', 'Deductions', 'Net Salary'].map(h => (
+              {['Employee', 'Team', 'Base Salary', 'Subs / Target', 'Achievement', 'KPI Earned', 'Net Salary'].map(h => (
                 <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: '0.72rem', color: '#8b949e', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase', borderBottom: '1px solid #21262d' }}>{h}</th>
               ))}
             </tr>
@@ -132,9 +137,20 @@ export default function Payroll({ dark, t }: { dark?: boolean, t?: any }) {
                   <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '0.72rem', background: 'rgba(88,166,255,0.15)', color: '#58a6ff' }}>{e.team_name || '—'}</span>
                 </td>
                 <td style={{ padding: '12px 16px', color: '#e6edf3' }}>EGP {Number(e.base_salary).toLocaleString()}</td>
-                <td style={{ padding: '12px 16px', color: '#3fb950', fontWeight: '600' }}>{e.subscription_count}</td>
-                <td style={{ padding: '12px 16px', color: '#FFD700', fontWeight: '600' }}>+ EGP {Number(e.bonus).toLocaleString()}</td>
-                <td style={{ padding: '12px 16px', color: '#f85149' }}>EGP 0</td>
+                <td style={{ padding: '12px 16px' }}>
+                  <span style={{ color: '#3fb950', fontWeight: '600' }}>{e.subscription_count}</span>
+                  <span style={{ color: '#8b949e', fontSize: '0.78rem' }}> / {e.monthly_target || 60}</span>
+                </td>
+                <td style={{ padding: '12px 16px' }}>
+                  <span style={{
+                    padding: '3px 10px', borderRadius: '99px', fontSize: '0.78rem', fontWeight: '600',
+                    background: e.achievement >= 100 ? 'rgba(255,215,0,0.15)' : e.achievement >= 80 ? 'rgba(63,185,80,0.15)' : 'rgba(248,81,73,0.15)',
+                    color: e.achievement >= 100 ? '#FFD700' : e.achievement >= 80 ? '#3fb950' : '#f85149',
+                  }}>{e.achievement}%</span>
+                </td>
+                <td style={{ padding: '12px 16px', color: e.bonus > 0 ? '#FFD700' : '#8b949e', fontWeight: '600' }}>
+                  {e.bonus > 0 ? `+ EGP ${Number(e.bonus).toLocaleString()}` : e.kpi_amount > 0 ? '—' : 'No KPI'}
+                </td>
                 <td style={{ padding: '12px 16px', color: '#3fb950', fontWeight: '800', fontSize: '1rem' }}>EGP {Number(e.net_salary).toLocaleString()}</td>
               </tr>
             ))}

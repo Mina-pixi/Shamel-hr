@@ -130,8 +130,9 @@ export default function Employees({ dark, t }: { dark?: boolean, t?: any }) {
               <input type="number" placeholder="3000" value={form.base_salary} onChange={e => setForm({ ...form, base_salary: e.target.value })} />
             </div>
             <div>
-              <div style={{ fontSize: '0.75rem', color: '#8b949e', marginBottom: '6px' }}>Bonus per Subscription (EGP)</div>
-              <input type="number" placeholder="50" value={form.bonus_per_sub} onChange={e => setForm({ ...form, bonus_per_sub: e.target.value })} />
+              <div style={{ fontSize: '0.75rem', color: '#8b949e', marginBottom: '6px' }}>KPI Amount (EGP)</div>
+              <input type="number" placeholder="2000" value={form.bonus_per_sub} onChange={e => setForm({ ...form, bonus_per_sub: e.target.value })} />
+              <div style={{ fontSize: '0.68rem', color: '#8b949e', marginTop: '4px' }}>Earned when agent hits 80%+ of 60 subs target</div>
             </div>
           </div>
           {msg && <div style={{ margin: '12px 0', fontSize: '0.85rem', color: msg.includes('✅') ? '#3fb950' : '#f85149' }}>{msg}</div>}
