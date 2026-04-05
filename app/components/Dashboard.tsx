@@ -64,7 +64,7 @@ export default function Dashboard({ onNavigate, dark, t }: { onNavigate: (page: 
         <circle cx="9" cy="7" r="4" stroke="url(#si1)" strokeWidth="2"/>
         <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="url(#si1)" strokeWidth="2" strokeLinecap="round"/>
       </svg>) },
-    { label: \`Payroll \${monthName}\`, value: \`EGP \${stats.totalPayroll.toLocaleString()}\`, color: '#3fb950', icon: (
+    { label: `Payroll ${monthName}`, value: `EGP ${stats.totalPayroll.toLocaleString()}`, color: '#3fb950', icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
         <defs><linearGradient id="si2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#3fb950"/><stop offset="100%" stopColor="#2ea043"/></linearGradient></defs>
         <rect x="2" y="5" width="20" height="14" rx="2" stroke="url(#si2)" strokeWidth="2"/>
