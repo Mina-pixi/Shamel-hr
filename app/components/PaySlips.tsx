@@ -4,7 +4,8 @@ import { pointsDB, crmAnon } from '@/lib/supabase';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-export default function PaySlips() {
+export default function PaySlips({ dark, t }: { dark?: boolean, t?: any }) {
+  const theme = t || { panel: '#161b22', panelBorder: '#21262d', text: '#e6edf3', subtext: '#8b949e', inputBg: '#0d1117', inputBorder: '#30363d', tableBorder: '#161b22' };
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
   const [year, setYear] = useState(now.getFullYear());

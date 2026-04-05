@@ -4,7 +4,8 @@ import { pointsDB, crmDB } from '@/lib/supabase';
 
 const TEAMS = ['Team 1','Team 2','Team 3','Team 4','Team 5','Team 6','Team On Ground','Team I Career','Team Seniors leader'];
 
-export default function Employees() {
+export default function Employees({ dark, t }: { dark?: boolean, t?: any }) {
+  const theme = t || { panel: '#161b22', panelBorder: '#21262d', text: '#e6edf3', subtext: '#8b949e', inputBg: '#0d1117', inputBorder: '#30363d', tableBorder: '#161b22' };
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);

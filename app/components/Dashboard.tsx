@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import { pointsDB, crmAnon } from '@/lib/supabase';
 
-export default function Dashboard({ onNavigate }: { onNavigate: (page: string) => void }) {
+export default function Dashboard({ onNavigate, dark, t }: { onNavigate: (page: string) => void, dark?: boolean, t?: any }) {
+  const theme = t || { panel: '#161b22', panelBorder: '#21262d', text: '#e6edf3', subtext: '#8b949e', tableBorder: '#161b22' };
   const [stats, setStats] = useState({ employees: 0, active: 0, totalPayroll: 0, pendingSlips: 0 });
   const [topPerformers, setTopPerformers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
