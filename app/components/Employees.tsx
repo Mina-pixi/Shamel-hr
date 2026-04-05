@@ -198,12 +198,60 @@ export default function Employees({ dark, t }: { dark?: boolean, t?: any }) {
                     {e.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
-                <td style={{ padding: '12px 16px' }}>
+                <td style={{ padding: '12px 16px', display: 'flex', gap: '6px' }}>
+                  <button onClick={() => { setEditId(editId === e.id ? null : e.id); setEditForm({...e}); }} style={{ fontSize: '0.72rem', padding: '4px 10px', background: editId === e.id ? 'rgba(88,166,255,0.2)' : 'none', border: '1px solid #58a6ff', borderRadius: '6px', color: '#58a6ff', cursor: 'pointer' }}>
+                    {editId === e.id ? 'Cancel' : 'Edit'}
+                  </button>
                   <button onClick={() => toggleActive(e.id, e.is_active)} style={{ fontSize: '0.72rem', padding: '4px 10px', background: 'none', border: '1px solid #30363d', borderRadius: '6px', color: '#8b949e', cursor: 'pointer' }}>
                     {e.is_active ? 'Deactivate' : 'Activate'}
                   </button>
                 </td>
               </tr>
+              {editId === e.id && (
+                <tr key={e.id + '_edit'} style={{ background: 'rgba(88,166,255,0.04)', borderBottom: '1px solid #30363d' }}>
+                  <td colSpan={8} style={{ padding: '16px 20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '12px' }}>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#8b949e', marginBottom: '4px' }}>Name</div>
+                        <input value={editForm.name || ''} onChange={ev => setEditForm({...editForm, name: ev.target.value})} style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', color: '#e6edf3', padding: '7px 10px', fontSize: '0.83rem', width: '100%' }} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#8b949e', marginBottom: '4px' }}>Base Salary (EGP)</div>
+                        <input type="number" value={editForm.base_salary || ''} onChange={ev => setEditForm({...editForm, base_salary: ev.target.value})} style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', color: '#3fb950', padding: '7px 10px', fontSize: '0.83rem', width: '100%' }} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#8b949e', marginBottom: '4px' }}>KPI Amount (EGP)</div>
+                        <input type="number" value={editForm.kpi_amount || ''} onChange={ev => setEditForm({...editForm, kpi_amount: ev.target.value})} style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', color: '#FFD700', padding: '7px 10px', fontSize: '0.83rem', width: '100%' }} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#8b949e', marginBottom: '4px' }}>Team</div>
+                        <select value={editForm.team_name || ''} onChange={ev => setEditForm({...editForm, team_name: ev.target.value})} style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', color: '#e6edf3', padding: '7px 10px', fontSize: '0.83rem', width: '100%' }}>
+                          {['Team 1','Team 2','Team 3','Team 4','Team 5','Team 6','Team On Ground','Team I Career','Team Seniors leader'].map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#8b949e', marginBottom: '4px' }}>Phone</div>
+                        <input value={editForm.phone || ''} onChange={ev => setEditForm({...editForm, phone: ev.target.value})} style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', color: '#e6edf3', padding: '7px 10px', fontSize: '0.83rem', width: '100%' }} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#8b949e', marginBottom: '4px' }}>National ID</div>
+                        <input value={editForm.national_id || ''} onChange={ev => setEditForm({...editForm, national_id: ev.target.value})} style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', color: '#e6edf3', padding: '7px 10px', fontSize: '0.83rem', width: '100%' }} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#8b949e', marginBottom: '4px' }}>Bank Account</div>
+                        <input value={editForm.bank_account || ''} onChange={ev => setEditForm({...editForm, bank_account: ev.target.value})} style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', color: '#e6edf3', padding: '7px 10px', fontSize: '0.83rem', width: '100%' }} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#8b949e', marginBottom: '4px' }}>Hire Date</div>
+                        <input type="date" value={editForm.hire_date || ''} onChange={ev => setEditForm({...editForm, hire_date: ev.target.value})} style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', color: '#e6edf3', padding: '7px 10px', fontSize: '0.83rem', width: '100%' }} />
+                      </div>
+                    </div>
+                    <button onClick={saveEdit} style={{ padding: '8px 24px', background: 'linear-gradient(135deg, #3fb950, #2ea043)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '0.875rem' }}>
+                      ✓ Save Changes
+                    </button>
+                  </td>
+                </tr>
+              )}
             ))}
           </tbody>
         </table>
