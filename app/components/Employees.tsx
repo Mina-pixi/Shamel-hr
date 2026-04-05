@@ -178,7 +178,7 @@ export default function Employees({ dark, t }: { dark?: boolean, t?: any }) {
               <tr><td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#8b949e' }}>Loading...</td></tr>
             ) : filtered.length === 0 ? (
               <tr><td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#8b949e' }}>No employees found. Add your first employee!</td></tr>
-            ) : filtered.map((e, i) => (
+            ) : filtered.map((e, i) => (<>
               <tr key={e.id} style={{ borderBottom: '1px solid #161b22' }}>
                 <td style={{ padding: '12px 16px', fontWeight: '600' }}>
                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #58a6ff, #a371f7)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '0.8rem', color: 'white', marginRight: '10px', verticalAlign: 'middle' }}>
@@ -252,7 +252,7 @@ export default function Employees({ dark, t }: { dark?: boolean, t?: any }) {
                   </td>
                 </tr>
               )}
-            ))}
+            </>))}
           </tbody>
         </table>
       </div>
